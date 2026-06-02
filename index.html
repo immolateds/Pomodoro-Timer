@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomodoro Timer</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+    * {margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center; 
+        min-height: 100vh; 
+        background: #F5F0E8; 
+        font-family: 'Lora', serif;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    h1 {
+        font-size: 1.1rem;
+        letter-spacing: 0.2rem;
+        text-transform: uppercase;
+        color: #8C7660;
+    }
+
+    .session-count {
+        font-style: italic;
+        font-size: 1.5rem;
+        color: #C4795A;
+    }
+
+    .mode-label {
+        font-style: italic;
+        font-size: 1.5rem;
+        color: #C4795A;
+    }
+
+    .mode-tabs {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        background-color: #EDE5D4;
+        padding: 5px;
+        border-radius: 100px;
+    }
+
+    .tab {
+        font-family: 'Lora', serif;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #8C7660;
+        padding: 0.45rem 1.1rem;
+        border-radius: 100px;
+        border: none;
+        background: none;
+        cursor: pointer;
+    }
+
+    .tab.active {
+        background: white;
+        color: #3D2E1E;
+    }
+
+    .session-dots {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #EDE5D4;
+        border: 1.5px solid #E8B49A;
+    }
+
+    .dot.filled {
+        background: #C4795A;
+        border-color: #C4795A;
+    }
+
+    .controls {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1.25rem;
+    }
+
+    .btn-main {
+        background: #C4795A;
+        color: white;
+        font-family: 'Lora', serif;
+        font-size: 1rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 0.85rem 2.5rem;
+        border-radius: 100px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-small {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #EDE5D4;
+        border: 1.5px solid rgba(109, 79, 58, 0.12);
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .ring-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        gap: 4px;
+    }
+
+    .time-display {
+        font-family: 'DM Mono', monospace;
+        font-size: 3.2rem;
+        font-weight: 300;
+        color: #3D2E1E;
+    }
+
+    .ring-bg {
+        fill: none;
+        stroke: #EDE5D4;
+        stroke-width: 10;
+    }
+
+    .ring-progress {
+        fill: none;
+        stroke: #C4795A;
+        stroke-width: 10;
+        stroke-linecap: round;
+        stroke-dasharray: 628;
+        stroke-dashoffset: 0;
+    }
+
+    body.break-mode {
+        background: #E8EFF4;
+    }
+
+    body.break-mode .mode-label {
+        color: #4A7A8A;
+    }
+
+    body.break-mode .btn-main {
+        background: #BCD3DB;
+    }
+
+    body.break-mode .ring-progress {
+        stroke: #BCD3DB;
+    }
+
+    body.break-mode .btn-small {
+        background: #7DACC0;
+        border-color: #7DACC0;
+    }
+
+    body.break-mode .dot {
+        border-color: #7DACC0;
+    }
+
+    body.break-mode .dot.filled {
+        background-color: #BCD3DB;
+        border-color: #BCD3DB;
+    }
+
+    body.break-mode .mode-tabs {
+        background-color: #BCD3DB;
+    }
+
+    body.break-mode .session-count {
+        color: #4A7A8A;
+    }
+
+    body.break-mode .time-display {
+        color: #2C4F5C;
+    }
+
+    body.break-mode .ring-bg {
+        stroke: #C5D8E0;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pomodoro</h1>
+        <p class="mode-label" id="modeLabel">Focus Time</p>
+        <div class="mode-tabs">
+            <button class="tab active" id="tab-focus" onclick="setMode('focus')">Focus</button>
+            <button class="tab" id="tab-short" onclick="setMode('short')">Short Break</button>
+            <button class="tab" id="tab-long" onclick="setMode('long')">Long Break</button>
+            </div>
+        <div class="ring-wrapper">
+            <svg width="260" height="260" style="position: absolute;">
+                <circle class="ring-bg" cx="130" cy="130" r="100"/>
+                <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="100"/>
+            </svg>
+            <div class="time-display" id="timeDisplay">25:00</div>
+            <p class="session-count">session 1</p>
+        </div>
+        <div class="controls">
+            <button class="btn btn-small" id="resetBtn" onclick="resetTimer()">↺</button>
+            <button class="btn btn-main" id="startBtn" onclick="toggleTimer()">Start</button>
+            <button class="btn btn-small">→</button>
+        </div>
+        <div class="session-dots">
+            <div class="dot filled" id="dot-0"></div>
+            <div class="dot" id="dot-1"></div>
+            <div class="dot" id="dot-2"></div>
+            <div class="dot" id="dot-3"></div>
+        </div>
+    </div>
+    <script>
+        const MODES = {
+            focus: 25 * 60,
+            short: 5 * 60, 
+            long: 15 * 60,
+        }
+        const timeDisplay = document.getElementById('timeDisplay')
+        const startBtn = document.getElementById('startBtn')
+        const restartBtn = document.getElementById('resetBtn')
+
+        let totalSeconds = 25 * 60;
+        let remainingSeconds = 25 * 60;
+        let running = false;
+        let interval = null;
+        let completeSessions = 0;
+
+        function updateDisplay() {
+            let Minutes = Math.floor(remainingSeconds / 60)
+            let Seconds = remainingSeconds % 60 
+            let padMinutes = Minutes.toString().padStart(2, '0')
+            let padSeconds = Seconds.toString().padStart(2,'0')
+            timeDisplay.textContent = `${padMinutes}:${padSeconds}`
+        }
+
+        function tick() {
+            if (remainingSeconds <= 0){
+                clearInterval(interval)
+                running = false
+                onComplete()
+                return
+            }
+            remainingSeconds--;
+            updateDisplay()
+            updateRing()
+        }
+
+        function toggleTimer(){
+            if (running) {
+                running = false;
+                clearInterval(interval)
+                startBtn.textContent = 'Resume'
+            }
+            else {
+                running = true;
+                interval = setInterval(tick, 1000)
+                startBtn.textContent = 'Pause'
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(interval)
+            running = false
+            remainingSeconds = totalSeconds
+            startBtn.textContent = 'Start'
+            updateDisplay()
+            updateRing()
+        }
+
+        function updateRing() {
+            const ring = document.getElementById('ringProgress')
+            const ratio = remainingSeconds / totalSeconds
+            const offset = 628 * (1 - ratio)
+            ring.style.strokeDashoffset = offset + 'px'
+        }
+
+        function setMode(mode) {
+            document.body.classList.toggle('break-mode', mode !== 'focus')
+            document.querySelectorAll('.tab').forEach((tab,index) => {
+                tab.classList.remove('active')
+            })
+            document.getElementById('tab-' + mode).classList.add('active')
+            const labels = {focus: 'Focus Time', short: 'Short Break', long: 'Long Break'}
+            document.getElementById('modeLabel').textContent = labels[mode]
+            clearInterval(interval)
+            running = false
+            totalSeconds = MODES[mode]
+            remainingSeconds = MODES[mode]
+            startBtn.textContent = 'Start'
+            updateDisplay()
+            updateRing()
+        }
+
+        function updateDots() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById('dot-' + i)
+                dot.classList.toggle('filled', i <completeSessions)
+            }
+        }
+        
+       function onComplete() {
+         if (completeSessions < 4) {
+            completeSessions++
+            updateDots()
+            }
+        }
+    </script>
+</body>
+</html>
