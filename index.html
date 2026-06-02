@@ -216,12 +216,12 @@
                 <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="100"/>
             </svg>
             <div class="time-display" id="timeDisplay">25:00</div>
-            <p class="session-count">session 1</p>
+            <p class="session-count" id="sessionCount">session 1</p>
         </div>
         <div class="controls">
             <button class="btn btn-small" id="resetBtn" onclick="resetTimer()">↺</button>
             <button class="btn btn-main" id="startBtn" onclick="toggleTimer()">Start</button>
-            <button class="btn btn-small">→</button>
+            <button class="btn btn-small" onclick="skipSession()">→</button>
         </div>
         <div class="session-dots">
             <div class="dot filled" id="dot-0"></div>
@@ -323,7 +323,15 @@
          if (completeSessions < 4) {
             completeSessions++
             updateDots()
+            document.getElementById('sessionCount').textContent = 'session ' + (completeSessions + 1)
+            startBtn.textContent = 'Start'
             }
+        }
+
+        function skipSession (){
+            clearInterval(interval)
+            running = false
+            onComplete()
         }
     </script>
 </body>
